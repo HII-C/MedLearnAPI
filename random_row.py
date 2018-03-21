@@ -1,7 +1,7 @@
 import json
-from flask import Flask, Response, abort
-import MySQLdb as mysql
-
+from flask import Flask, Response
+import MySQLdb as sql
+#import pymysql as sql
 app = Flask(__name__)
 
 @app.route('/rand_row')
@@ -10,10 +10,10 @@ def get_random_row():
     host_ = 'localhost'
     pass_ = 'hiic'
     db_ = 'derived'
-    conn = mysql.connect(user_, host_, db_, pass_)
+    conn = sql.connect(user = user_, host = host_, db = db_, passwd = pass_)
     cursor = conn.cursor()
     query_row_string = 'SELECT * FROM FAKE_DIAGNOSIS ORDER BY RAND() LIMIT 1;'
-    cursor.execute(query_row_string);
+    cursor.execute(query_row_string)
     row = cursor.fetchall()
     reponse = Response(json.dumps(row), status=200, mimetype= 'application/json')
     return reponse
@@ -21,3 +21,4 @@ def get_random_row():
 @app.errorhandler(404)
 def not_found(e):
     return '', 404
+
