@@ -1,8 +1,8 @@
 import json
 from flask import Flask, Response
-import MySQLdb as sql
-#import pymysql as sql
-app = Flask(__name__)
+#import MySQLdb as sql
+import pymysql as sql
+
 
 @app.route('/rand_row')
 def get_random_row():
