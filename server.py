@@ -1,10 +1,7 @@
-#connect to local mysql using mysqldb
-#pull out one row
-#return the row statement as a json file
 from flask import Flask
 from flask_restful import Api
 from MedLearnQuery import MedLearnQuery
-#from get_row import getRow
+#from random_row import rand_r
 import os
 
 app = Flask(__name__)
@@ -19,6 +16,8 @@ def start():
               """
 
 api.add_resource(MedLearnQuery, '/query_results', '/query_results/<string:query_params>', '/query_results/<string:query_params>/')
+#api.add_resource(rand_r, '/rand_row', '/rand_row/')
+
 
 if __name__ == "__main__":
     app.debug = True
