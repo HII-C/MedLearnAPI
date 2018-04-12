@@ -12,7 +12,9 @@ client = None
 @app.route('/')
 def start():
     return """<b>HII-C MedLearn API.</b><br><br>
-              This a playground for HII-C MedLearn
+    ༼ つ ◕_◕ ༽つ This a playground for HII-C MedLearn
+    ༼ つ ◕_◕ ༽つ                                      
+              
               """
 
 api.add_resource(MedLearnQuery, '/query_results', '/query_results/<string:query_params>', '/query_results/<string:query_params>/')
