@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Api
-from MedLearnQuery import MedLearnQuery
+from pred_occ_query import pred_occ_query
+from ml_query import ml_query
 #from random_row import rand_r
 import os
 
@@ -12,12 +13,11 @@ client = None
 @app.route('/')
 def start():
     return """<b>HII-C MedLearn API.</b><br><br>
-    ༼ つ ◕_◕ ༽つ This a playground for HII-C MedLearn
-    ༼ つ ◕_◕ ༽つ                                      
-              
+            This a playground for HII-C MedLearn   
               """
 
-api.add_resource(MedLearnQuery, '/query_results', '/query_results/<string:query_params>', '/query_results/<string:query_params>/')
+api.add_resource(pred_occ_query, '/query_results', '/query_results/<string:query_params>', '/query_results/<string:query_params>/')
+api.add_resource(ml_query, '/query_ml', '/query_ml/<string:query_params>', '/query_results/<string:query_params>/')
 #api.add_resource(rand_r, '/rand_row', '/rand_row/')
 
 
