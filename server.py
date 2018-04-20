@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_restful import Api
-from pred_occ_query import pred_occ_query
-from ml_query import ml_query
+from .pred_occ_query import pred_occ_query
+from .ml_query import ml_query
 #from random_row import rand_r
-from get_row import getRow
+from .get_row import getRow
 import os
 
 app = Flask(__name__)
@@ -24,4 +24,4 @@ api.add_resource(ml_query, '/query_ml', '/query_ml/<string:query_params>', '/que
 api.add_resource(getRow,'/get_row', '/get_row/<string:row_params>', '/get_row/<string:row_params>/')
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 9000)), threaded=True)
+    app.run(host='0.0.0.0')
