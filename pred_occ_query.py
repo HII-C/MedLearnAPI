@@ -24,8 +24,9 @@ class pred_occ_query(Resource):
                 subject_ = vals[0]
                 predicate_ = vals[1]
                 object_ = vals[2]
+                where_query = ''
                 if predicate_ is 'NULL':
-                    where_query = "' AND SUBJECT_CUI = '" + subject_ + "' AND OBJECT_CUI = '" + object_ + "'"
+                    where_query = "WHERE SUBJECT_CUI = '" + subject_ + "' AND OBJECT_CUI = '" + object_ + "'"
                 else:
                     where_query = "WHERE PREDICATE = '" + predicate_ + "' AND SUBJECT_CUI = '" + subject_ + "' AND OBJECT_CUI = '" + object_ + "'"
                 query_row_string = "SELECT * FROM austin_pred_occ_test " + where_query + " LIMIT 1;"
