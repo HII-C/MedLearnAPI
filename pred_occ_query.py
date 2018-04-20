@@ -19,14 +19,15 @@ class pred_occ_query(Resource):
             try:
                 conn = sql.connect(user=self.user_, host=self.host_, db=self.db_, passwd=self.pass_)
                 cursor = conn.cursor()
-                #assuming that the url is something like: "http://something.com/get_results/Predicate&Subject&Object"
-                vals = query_params.split("&")
+                #assuming that the url is something like: "http://something.com/get_results/SUBJECT_CUI+PREDICATE+OBJECT_CUI"
+                vals = query_params.split("+")
                 subject_ = vals[0]
-                subject_ = subject_.replace('+', ' ')
                 predicate_ = vals[1]
                 object_ = vals[2]
-                object_ = object_.replace('+', ' ')
-                where_query = "WHERE PREDICATE = '" + predicate_ + "' AND SUBJECT_NAME = '" + subject_ + "' AND OBJECT_NAME = '" + object_ + "'"
+                if predicate_ is 'NULL':
+                    where_query = "' AND SUBJECT_CUI = '" + subject_ + "' AND OBJECT_CUI = '" + object_ + "'"
+                else:
+                    where_query = "WHERE PREDICATE = '" + predicate_ + "' AND SUBJECT_CUI = '" + subject_ + "' AND OBJECT_CUI = '" + object_ + "'"
                 query_row_string = "SELECT * FROM austin_pred_occ_test " + where_query + " LIMIT 1;"
                 print(query_row_string)
                 cursor.execute(query_row_string)

@@ -16,8 +16,8 @@ class ml_query(Resource):
             try:
                 conn = sql.connect(user=self.user_, host=self.host_, db=self.db_, passwd=self.pass_)
                 cursor = conn.cursor()
-                #assuming that the url is something like: "http://something.com/get_results/STRING&code&pred"
-                vals = query_params.split("&")
+                #assuming that the url is something like: "http://something.com/get_results/STRING+code+pred"
+                vals = query_params.split("+")
                 encode_ = vals[0]
                 if encode_ is 'condition':
                     encode_ = int (0)
