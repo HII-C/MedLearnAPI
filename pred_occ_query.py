@@ -4,8 +4,8 @@
 import json
 from flask_restful import Resource
 from flask import Flask, Response
-import MySQLdb as sql
-#import pymysql as sql
+#import MySQLdb as sql
+import pymysql as sql
 
 class pred_occ_query(Resource):
     def __init__(self):

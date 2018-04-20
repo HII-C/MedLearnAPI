@@ -1,8 +1,8 @@
 import json
 from flask_restful import Resource
 from flask import Flask, Response
-import MySQLdb as sql
-#import pymysql as sql
+#import MySQLdb as sql
+import pymysql as sql
 
 class ml_query(Resource):
     def __init__(self):
