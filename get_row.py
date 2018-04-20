@@ -21,8 +21,10 @@ class getRow(Resource):
                 # assuming that the url is something like: "http://something.com/get_results/Predicate/Subject/Object"
                 vals = row_params.split("+")
                 subject_ = vals[0]
+                subject_ = subject_.replace('&', ' ')
                 predicate_ = vals[1]
                 object_ = vals[2]
+                object_ = subject_.replace('&', ' ')
                 where_query = "WHERE PREDICATE = '" + predicate_ + "' AND SUBJECT_NAME = '" + subject_ + "' AND OBJECT_NAME = '" + object_ + "'"
                 query_row_string = "SELECT * FROM austin_pred_occ_test " + where_query + " LIMIT 1;"
                 print("this is the query: " + query_row_string)
