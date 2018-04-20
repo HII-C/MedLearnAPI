@@ -24,4 +24,4 @@ api.add_resource(ml_query, '/query_ml', '/query_ml/<string:query_params>', '/que
 api.add_resource(getRow,'/get_row', '/get_row/<string:row_params>', '/get_row/<string:row_params>/')
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1')
+    app.run(host='0.0.0.0')
