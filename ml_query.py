@@ -19,18 +19,13 @@ class ml_query(Resource):
                 #assuming that the url is something like: "http://something.com/get_results/STRING+code+pred"
                 vals = query_params.split("+")
                 encode_ = vals[0]
-                if encode_ is 'condition':
-                    encode_ = int (0)
-                elif encode_ is 'observation':
-                    encode_ = int (1)
-                elif encode is 'medication':
-                    encode_ = int (2)
-                else:
-                    encode_ = int (-1)
-                subject_cui = vals[1]
+                data_map = {"Condition": 0, "Observation": 1, "Medication": 2}
+                subject_code = vals[1]
                 pred_ = vals[2]
-                where_query = "WHERE PREDICATE = '" + pred_ + "' AND SUBJECT_CUI = '" + subject_cui + "' AND <SEN_TYPE> = '" + encode_ + "'"
-                query_row_string = "SELECT * FROM <ml_output_table> " + where_query + " LIMIT 1;"
+                type_ = data_map[vals]
+                where_query = f"""WHERE subject_type = \'{type_}\' AND subject_code = \'{subject_code}\'"""
+                n = 20
+                query_row_string = f"""SELECT * FROM ml_output {where_query} LIMIT {n}"""
                 print(query_row_string)
                 cursor.execute(query_row_string)
                 row = cursor.fetchall()
