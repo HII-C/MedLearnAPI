@@ -1,10 +1,11 @@
 import json
 from dataclasses import dataclass
-from typing import List, T, Dict
+from typing import List, T, Dict, Tuple
 from enum import Enum
 from flask_restful import Resource
 from flask import Flask, Response, request
-#import MySQLdb as sql
+from numpy import array
+# import MySQLdb as sql
 import pymysql as sql
 
 
@@ -25,87 +26,98 @@ class Relation(Enum):
 
 
 @dataclass
-class concept:
-    concept_type: ConceptType
-    concept_code: str = ""
-    encoding_system: EncodingSystem
-    concept_value: float = 0.0
-    concept_units: str = ""
+class Concept:
+    type_: ConceptType
+    code: str = ""
+    system: EncodingSystem
+    value: float = 0.0
+    units: str = ""
 
     def __init__(self, type_, code, system, value, units):
-        self.concept_type = type_
-        self.concept_code = code
-        self.encoding_system = system
-        self.concept_value = value
-        self.concept_units = units
+        self.type_ = type_
+        self.code = code
+        self.system = system
+        self.value = value
+        self.units = units
 
 
 @dataclass
-class mapping:
-    concept1_hash: str = ""
-    concept2_hash: str = ""
+class Mapping:
+    c1_hash: str = ""
+    c2_hash: str = ""
     relation: Relation
     coeff_dict: Dict = None
 
     def __init__(self, hash1, hash2, relation, coeff_dict):
-        self.concept1_hash = hash1
-        self.concept2_hash = hash2
+        self.c1_hash = hash1
+        self.c2_hash = hash2
         self.relation = relation
         self.coeff_dict = coeff_dict
 
 
 class get_mapppings(Resource):
-    def __init__(self):
+    user: str = ""
+    host: str = ""
+    pw_: str = ""
+    db: str = ""
+    table_name: str = ""
+    coeff_dict_form: Dict[str, int] = {"gain": 3}
+    conn: sql.connections.Connection = None
+    cursor: sql.cursors.Cursor = None
+
+    def __init__(self, user='hiic', host='db01.healthcreek.org', pw_='greenes2018', db='derived', table_name="tmp"):
         # i just put the connect and db access information because I was using a local database
-        self.user_ = 'hiic'
-        self.host_ = 'db01.healthcreek.org'
-        self.pass_ = 'greenes2018'
-        self.db_ = 'derived'
+        self.user = user
+        self.host = host
+        self.pw_ = pw_
+        self.db = db
+        self.conn = sql.connect(user=self.user, host=self.host,
+                                db=self.db, passwd=self.pw_)
+        self.cursor = self.conn.cursor()
+        self.table_name = table_name
 
-    # {'subj_list': [ ... ], 'obj_list': [ ... ]}
+    # Parameters of form: {'subj_list': [ ... ], 'obj_list': [ ... ]}
     def get(self):
-        subj_list = request.args.get('subj_list')
-        obj_list = request.args.get('obj_list')
-        table_name = "tmp"
+        raw_subj_list = request.args['subj_list']
+        raw_obj_list = request.args['obj_list']
 
-        if (len(subj_list) == 0) or (len(obj_list) == 0):
+        if (len(raw_subj_list) == 0) or (len(raw_obj_list) == 0):
             raise ValueError("Data must have non-zero length")
 
-        try:
-            conn = sql.connect(
-                user=self.user_, host=self.host_, db=self.db_, passwd=self.pass_)
-            cursor = conn.cursor()
-            mapping_list = list()
-            concept_dict = dict()
-            json_list = list()
-            #
-            # Save JSON subject list
-            # Save JSON object list
-            #
+        hash_to_mappings: Dict[str, List[Mapping]] = dict()
+        hash_to_concept: Dict[str, Concept] = dict()
+        ret_dict: Dict[str, dict] = dict()
 
-            for subj in subj_list:
-                for obj in obj_list:
-                    where_query = f"""WHERE subject_code = \'{subj.concept_code}\' AND object_code = \'{obj.concept_code}\'"""
-                    subj = 1
-                    query_row_string = f"""SELECT * FROM {table_name} {where_query} LIMIT {obj}"""
-                    print(query_row_string)
-                    cursor.execute(query_row_string)
-                    row = cursor.fetchall()
+        subj_list: List[Concept] = [Concept(**subj) for subj in raw_subj_list]
+        obj_list: List[Concept] = [Concept(**obj) for obj in raw_obj_list]
 
-                    # initialize mapping object
-                    temp = mapping(row[0], row[1], row[2], row[3])
+        for conc in (subj_list + obj_list):
+            hash_to_concept[hash(conc)] = conc
 
-                    # insert into mapping list
-                    mapping_list.append(temp)
+        subj_code_tup: Tuple[Tuple[str, str]] = tuple(
+            [tuple([hash(subj), subj.code]) for subj in subj_list])
+        obj_code_tup = tuple([[hash(obj), obj.code] for obj in obj_list])
 
-                    # contains all subjects and objects
-                    concept_dict.update({subj: obj})
+        for subj_code in subj_code_tup:
+            for obj_code in obj_code_tup:
+                where_query = f"""WHERE subject_code = '{subj_code[1]}' AND object_code in {obj_code_tup[1]}"""
+                exec_str = f"""SELECT * FROM {self.table_name} {where_query}"""
+                print(exec_str)
 
-                    # return lists as JSON file
-                    json_list.append(mapping_list, concept_dict)
-                    response = Response(json.dumps(
-                        json_list), status=200, mimetype='application/json')
-                    return response
+                self.cursor.execute(exec_str)
+                # assuming: c1 | c2 | rela | gain | boost | bs
+                row = self.cursor.fetchall()
 
-        except:
-            return json.dumps({})
+                coeff_dict = dict()
+                for k, v in self.coeff_dict_form.items():
+                    coeff_dict[k] = float(row[v])
+
+                tmp = {"hash1": subj_code[0], "hash2": obj_code[0],
+                       "relation": row[2], "coeff_dict": coeff_dict}
+                hash_to_mappings[subj_code[0]].extend([Mapping(**tmp)])
+
+        ret_dict = {"hash_to_mappings": hash_to_mappings,
+                    "hash_to_concept": hash_to_concept}
+        response = Response(json.dumps(ret_dict), status=200,
+                            mimetype='application/json')
+        return response
