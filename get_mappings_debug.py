@@ -2,11 +2,12 @@ import json
 from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from enum import Enum
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 from flask import Flask, Response, request
 from numpy import array
 # import MySQLdb as sql
 import pymysql as sql
+import requests
 
 
 class ConceptType(Enum):
@@ -84,15 +85,16 @@ class get_mapppings(Resource):
     # Parameters of form: {'subj_list': [ ... ], 'obj_list': [ ... ]}
     def get(self):
         # the json objects are recieved via request
-        raw_subj_list = request.args['subj_list']
-        raw_subj_list = raw_subj_list.split('+')
-        subj_concept_list = list()
-        for x in raw_subj_list:
-            temp_list = x.split(',')
-            temp_concept = Concept(temp_list[0],temp_list[1],temp_list[2],temp_list[3],temp_list[4])
-            subj_concept_list.append(temp_concept)
-        print(subj_concept_list)
-        raw_obj_list = request.args['obj_list']
+        req_parser = reqparse.RequestParser()
+        req_parser.add_argument('subj_list', type = str, action = 'append')
+        req_parser.add_argument('obj_list', type = str, action = 'append')
+        args = req_parser.parse_args()
+        raw_subj_list = args['subj_list']
+        print(raw_subj_list)
+        print(len(raw_subj_list))
+        raw_obj_list = args['obj_list']
+        print(raw_obj_list)
+        print(len(raw_obj_list))
         raw_obj_list = raw_obj_list.split('+')
         obj_concept_list = list()
         for x in raw_obj_list:

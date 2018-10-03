@@ -14,6 +14,7 @@ def start():
     return """<b>HII-C MedLearn API.</b><br><br>
             This a playground for HII-C MedLearn   
             """
+
 api.add_resource(get_mapppings, '/get_mappings')
 
 
