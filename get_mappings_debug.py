@@ -90,18 +90,23 @@ class get_mapppings(Resource):
         req_parser.add_argument('obj_list', type = str, action = 'append')
         args = req_parser.parse_args()
         raw_subj_list = args['subj_list']
-        print(raw_subj_list)
-        print(len(raw_subj_list))
         raw_obj_list = args['obj_list']
-        print(raw_obj_list)
-        print(len(raw_obj_list))
-        raw_obj_list = raw_obj_list.split('+')
-        obj_concept_list = list()
+        subj_list = list()
+        for x in raw_subj_list:
+            json_accpetable_string = x.replace("'", "\"")
+            json_x = json.loads(json_accpetable_string)
+            temp_concept = Concept(**json_x)
+            subj_list.append(temp_concept)
+        print(len(subj_list))
+
+        obj_list = list()
         for x in raw_obj_list:
-            temp_list = x.split(',')
-            temp_concept = Concept(temp_list[0], temp_list[1], temp_list[2], temp_list[3], temp_list[4])
-            obj_concept_list.append(temp_concept)
-        print(obj_concept_list)
+            json_accpetable_string = x.replace("'", "\"")
+            json_x = json.loads(json_accpetable_string)
+            temp_concept = Concept(**json_x)
+            obj_list.append(temp_concept)
+        print(len(obj_list))
+
 
         # checks to see if the lists for the subj_list and the obj_list are zero
         if (len(raw_subj_list) == 0) or (len(raw_obj_list) == 0):
