@@ -91,25 +91,11 @@ class get_mapppings(Resource):
         args = req_parser.parse_args()
         raw_subj_list = args['subj_list']
         raw_obj_list = args['obj_list']
-        subj_list = list()
-        for x in raw_subj_list:
-            json_accpetable_string = x.replace("'", "\"")
-            json_x = json.loads(json_accpetable_string)
-            temp_concept = Concept(**json_x)
-            subj_list.append(temp_concept)
-        print(len(subj_list))
-
-        obj_list = list()
-        for x in raw_obj_list:
-            json_accpetable_string = x.replace("'", "\"")
-            json_x = json.loads(json_accpetable_string)
-            temp_concept = Concept(**json_x)
-            obj_list.append(temp_concept)
-        print(len(obj_list))
-
+        subj_list: List[Concept] = [Concept(**json.loads(subj.replace("'", "\""))) for subj in raw_subj_list]
+        obj_list: List[Concept] = [Concept(**json.loads(obj.replace("'", "\""))) for obj in raw_obj_list]
 
         # checks to see if the lists for the subj_list and the obj_list are zero
-        if (len(raw_subj_list) == 0) or (len(raw_obj_list) == 0):
+        if (len(subj_list) == 0) or (len(obj_list) == 0):
             raise ValueError("Data must have non-zero length")
 
         # the result will be ret_dict which is hash_to_mappings over hash_to_concept
@@ -117,26 +103,20 @@ class get_mapppings(Resource):
         hash_to_concept: Dict[str, json] = dict()
         ret_dict: Dict[str, dict] = dict()
 
-        # creating a list of subj and obj by iterating the raw_subj_list and passing in the attributes as an argument to the constructor
-        #subj_list: List[Concept] = [Concept(**subj) for subj in raw_subj_list]
-        #obj_list: List[Concept] = [Concept(**obj) for obj in raw_obj_list]
-
         # create the hash to concept dict by utilizing the subj and obj hash as the key the the subj/obj as a value
-        for conc in (subj_concept_list + obj_concept_list):
+        for conc in (subj_list + obj_list):
             hash_to_concept[hash(conc.code)] = (conc.__dict__)
+            print(conc.__dict__)
 
         #created tuple of subj with its hash and obj with its hash (hash: 0, sub/obj: 1)
-        subj_code_tup: tuple(tuple[hash, str]) = tuple(tuple([hash(subj.code), subj.code]) for subj in subj_concept_list)
-
+        subj_code_tup: tuple(tuple[hash, str]) = tuple(tuple([hash(subj.code), subj.code]) for subj in subj_list)
         print(subj_code_tup)
-        obj_code_tup: tuple(tuple[hash, str]) = tuple([tuple([hash(obj.code), obj.code]) for obj in obj_concept_list])
+        obj_code_tup: tuple(tuple[hash, str]) = tuple([tuple([hash(obj.code), obj.code]) for obj in obj_list])
         print(obj_code_tup)
 
         for subj_code in subj_code_tup:
             mappings_list: list(dict) = list()
             for obj_code in obj_code_tup:
-                print(subj_code[1])
-                print(obj_code[1])
                 where_query = f"""WHERE c1 = '{subj_code[1]}' AND c2 = '{obj_code[1]}'"""
                 exec_str = f"""SELECT * FROM {self.table_name} {where_query}"""
                 print(exec_str)
@@ -146,20 +126,13 @@ class get_mapppings(Resource):
                 row = self.cursor.fetchall()
                 print(row)
                 if (len(row) == 0):
-                    next()
+                    continue
                 else:
 
                     for x in row:
                         coefficient: Dict[str, int] = {"gain": x[3]}
                         tmp_mapping = Mapping(x[0], x[1], x[2], coefficient)
                         mappings_list.append(tmp_mapping.__dict__)
-
-
-
-                    tmp = {"c1_hash": subj_code[0], "c2_hash": obj_code[0],
-                           "relation": [x[2] for x in row], "coeff_dict": [x[3] for x in row]}
-
-                    print(tmp)
 
 
             hash_to_mappings[subj_code[0]] = mappings_list
