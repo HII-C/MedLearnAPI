@@ -35,7 +35,7 @@ class Concept:
     value: float
     units: str
 
-    #constructor for Concept
+    # constructor for Concept
     def __init__(self, type_, code, system, value, units):
         self.type_ = type_
         self.code = code
@@ -81,18 +81,20 @@ class get_mapppings(Resource):
         self.table_name = table_name
         print('connected')
 
-
     # Parameters of form: {'subj_list': [ ... ], 'obj_list': [ ... ]}
+
     def get(self):
         # the json objects are recieved via request
         req_parser = reqparse.RequestParser()
-        req_parser.add_argument('subj_list', type = str, action = 'append')
-        req_parser.add_argument('obj_list', type = str, action = 'append')
+        req_parser.add_argument('subj_list', type=str, action='append')
+        req_parser.add_argument('obj_list', type=str, action='append')
         args = req_parser.parse_args()
         raw_subj_list = args['subj_list']
         raw_obj_list = args['obj_list']
-        subj_list: List[Concept] = [Concept(**json.loads(subj.replace("'", "\""))) for subj in raw_subj_list]
-        obj_list: List[Concept] = [Concept(**json.loads(obj.replace("'", "\""))) for obj in raw_obj_list]
+        subj_list: List[Concept] = [
+            Concept(**json.loads(subj.replace("'", "\""))) for subj in raw_subj_list]
+        obj_list: List[Concept] = [
+            Concept(**json.loads(obj.replace("'", "\""))) for obj in raw_obj_list]
 
         # checks to see if the lists for the subj_list and the obj_list are zero
         if (len(subj_list) == 0) or (len(obj_list) == 0):
@@ -108,10 +110,10 @@ class get_mapppings(Resource):
             hash_to_concept[hash(conc.code)] = (conc.__dict__)
             print(conc.__dict__)
 
-        #created tuple of subj with its hash and obj with its hash (hash: 0, sub/obj: 1)
-        subj_code_tup: tuple(tuple[hash, str]) = tuple(tuple([hash(subj.code), subj.code]) for subj in subj_list)
+        # created tuple of subj with its hash and obj with its hash (hash: 0, sub/obj: 1)
+        subj_code_tup = {hash(subj.code): subj.code for subj in subj_list}
         print(subj_code_tup)
-        obj_code_tup: tuple(tuple[hash, str]) = tuple([tuple([hash(obj.code), obj.code]) for obj in obj_list])
+        obj_code_tup = {hash(obj.code): obj.code for obj in obj_list}
         print(obj_code_tup)
 
         for subj_code in subj_code_tup:
@@ -134,13 +136,12 @@ class get_mapppings(Resource):
                         tmp_mapping = Mapping(x[0], x[1], x[2], coefficient)
                         mappings_list.append(tmp_mapping.__dict__)
 
-
             hash_to_mappings[subj_code[0]] = mappings_list
 
         ret_dict = dict({"hash_to_mappings": hash_to_mappings,
-                    "hash_to_concept": hash_to_concept})
+                         "hash_to_concept": hash_to_concept})
 
-        #turn the ret_dict in to a json obj
+        # turn the ret_dict in to a json obj
         response = Response(json.dumps(ret_dict), status=200,
                             mimetype='application/json')
         return response

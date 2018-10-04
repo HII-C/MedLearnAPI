@@ -34,7 +34,7 @@ class Concept:
     value: float = 0.0
     units: str = ""
 
-    #constructor for Concept
+    # constructor for Concept
     def __init__(self, type_, code, system, value, units):
         self.type_ = type_
         self.code = code
@@ -89,8 +89,10 @@ class get_mapppings(Resource):
         args = req_parser.parse_args()
         raw_subj_list = args['subj_list']
         raw_obj_list = args['obj_list']
-        subj_list: List[Concept] = [Concept(**json.loads(subj.replace("'", "\""))) for subj in raw_subj_list]
-        obj_list: List[Concept] = [Concept(**json.loads(obj.replace("'", "\""))) for obj in raw_obj_list]
+        subj_list: List[Concept] = [
+            Concept(**json.loads(subj.replace("'", "\""))) for subj in raw_subj_list]
+        obj_list: List[Concept] = [
+            Concept(**json.loads(obj.replace("'", "\""))) for obj in raw_obj_list]
 
         # checks to see if the lists for the subj_list and the obj_list are zero
         if (len(subj_list) == 0) or (len(obj_list) == 0):
@@ -105,9 +107,11 @@ class get_mapppings(Resource):
         for conc in (subj_list + obj_list):
             hash_to_concept[hash(conc.code)] = (conc.__dict__)
 
-        #created tuple of subj with its hash and obj with its hash (hash: 0, sub/obj: 1)
-        subj_code_tup: tuple(tuple[hash, str]) = tuple(tuple([hash(subj.code), subj.code]) for subj in subj_list)
-        obj_code_tup: tuple(tuple[hash, str]) = tuple([tuple([hash(obj.code), obj.code]) for obj in obj_list])
+        # created tuple of subj with its hash and obj with its hash (hash: 0, sub/obj: 1)
+        subj_code_tup: tuple(tuple([hash, str])) = tuple(
+            tuple([hash(subj.code), subj.code]) for subj in subj_list)
+        obj_code_tup: tuple(tuple([hash, str])) = tuple(
+            [tuple([hash(obj.code), obj.code]) for obj in obj_list])
 
         for subj_code in subj_code_tup:
             mappings_list: list(dict) = list()
