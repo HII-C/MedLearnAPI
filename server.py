@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api
-from get_mappings_debug import get_mapppings
+from get_mappings import get_mapppings
 
 app = Flask(__name__)
 api = Api(app)
