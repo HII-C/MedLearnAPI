@@ -1,12 +1,12 @@
 import json
 from dataclasses import dataclass
-from typing import List, T, Dict, Tuple
+from typing import List, Tuple, Dict, Tuple
 from enum import Enum
 from flask_restful import Resource, reqparse
 from flask import Flask, Response, request
 from numpy import array
-import MySQLdb as sql
-# import pymysql as sql
+#import MySQLdb as sql
+import pymysql as sql
 
 
 class ConceptType(Enum):
