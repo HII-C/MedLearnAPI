@@ -49,5 +49,6 @@ class get_output(Resource):
         list_vals = list_vals[0:num_rel_conc]
 
         response = json.dumps(list_vals)
+        response = response.replace("\"", "")
 
         return response
