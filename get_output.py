@@ -7,6 +7,7 @@ from flask import Flask, Response, request
 from numpy import array
 from operator import itemgetter
 import MySQLdb as sql
+import MySQLdb.connections as connections
 #import pymysql as sql
 
 class get_output(Resource):
@@ -15,28 +16,34 @@ class get_output(Resource):
     pw_: str = ""
     db: str = ""
     table_name: str = ""
-    conn: sql.connections.Connection = None
-    cursor: sql.cursors.Cursor = None
+    connection: connections.Connection = None
+    cursor: connections.cursors.Cursor = None
 
-    def __init__(self, user='hiic', host='db01.healthcreek.org', pw_='greenes2018', db='derived', table_name="tmp"):
+    #def __init__(self, user='hiic', host='db01.healthcreek.org', pw_='greenes2018', db='derived', table_name="tmp")
+
+    def __init__(self, user='root', host='localhost', pw_='star2222', db='derived', table_name="model_output"):
         # the connection to the database only has to occur once therefor, it can occur in the initialization
         self.user = user
         self.host = host
         self.pw_ = pw_
         self.db = db
-        self.conn = sql.connect(user=self.user, host=self.host,
-                                db=self.db, passwd=self.pw_)
-        self.cursor = self.conn.cursor()
         self.table_name = table_name
+        print("not_connected")
+        self.connection = sql.connect(user=self.user, host=self.host,
+                                db=self.db, passwd=self.pw_)
+        self.cursor = self.connection.cursor()
+        print("connected")
 
 
     def get(self):
         arguments: Dict[str] = request.args.to_dict()
         num_rel_conc:int = int(arguments["num_rel_conc"])
         conc:str = str(arguments["conc"])
+        conc_str = f'\'{conc}\''
         exec = f'''
-                    SELECT * FROM {self.table_name}
-                        WHERE concept1 =  '{conc}' '''
+                    SELECT * FROM {self.table_name} WHERE concept1 = {conc_str}'''
+
+
         self.cursor.execute(exec)
         #[concept1, concept2, f_importance, model_accuracy]
         relations = self.cursor.fetchall()
