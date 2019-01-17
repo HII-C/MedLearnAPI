@@ -19,9 +19,8 @@ class get_output(Resource):
     connection: connections.Connection = None
     cursor: connections.cursors.Cursor = None
 
-    #def __init__(self, user='hiic', host='db01.healthcreek.org', pw_='greenes2018', db='derived', table_name="tmp")
-
-    def __init__(self, user='root', host='localhost', pw_='star2222', db='derived', table_name="model_output"):
+    def __init__(self, user='hiic', host='db01.healthcreek.org', pw_='greenes2018', db='derived', table_name="tmp"):
+    #def __init__(self, user='root', host='localhost', pw_='star2222', db='derived', table_name="model_output"):
         # the connection to the database only has to occur once therefor, it can occur in the initialization
         self.user = user
         self.host = host
