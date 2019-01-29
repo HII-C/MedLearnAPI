@@ -1,11 +1,7 @@
 import json
-from dataclasses import dataclass
-from typing import List, Tuple, Dict, Tuple
-from enum import Enum
-from flask_restful import Resource, reqparse
-from flask import Flask, Response, request
-from numpy import array
-from operator import itemgetter
+from typing import Dict
+from flask_restful import Resource
+from flask import Response, request
 import MySQLdb as sql
 import MySQLdb.connections as connections
 #import pymysql as sql
@@ -56,7 +52,7 @@ class get_assoc(Resource):
 
         response_list = response_list[0:response_len]
 
-        # turn the ret_dict in to a json obj
+        # turn the response_list in to a json obj
         response = Response(json.dumps(response_list), status=200,
                             mimetype='application/json')
 
