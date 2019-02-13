@@ -1,0 +1,7 @@
+# 
+json
+flask_restful
+flask
+mysqlclient
+numpy
+pymysql
