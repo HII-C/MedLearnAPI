@@ -1,10 +1,13 @@
-FROM ubuntu:18.04
-MAINTAINER Austin Michne "austinmichne@gmail.com" 
-RUN apt-get update -y
-RUN apt-get install -y python3-pip python-dev build-essential
-COPY . /
-WORKDIR /
-RUN pip3 install -r requirements.txt
-EXPOSE 5000
+FROM python:3.7.2-alpine3.9
 
-CMD ["./run_server.sh", "./root_db_password.txt"]
+MAINTAINER Austin Michne "austinmichne@gmail.com" 
+EXPOSE 80
+
+COPY . .
+# WORKDIR .
+
+RUN apk add gcc libc-dev linux-headers mariadb-dev
+
+RUN pip install -r requirements.txt
+
+CMD python ./server.py --user "root" --password "HealthCreekMySQLr00t" --host "129.219.151.23" --db "derived"

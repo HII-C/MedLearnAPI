@@ -1,7 +1,8 @@
 # 
-json
+# json
 flask_restful
+flask_cors
 flask
 mysqlclient
-numpy
+# numpy
 pymysql

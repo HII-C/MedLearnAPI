@@ -4,7 +4,7 @@ from typing import List, Tuple, Dict, Tuple
 from enum import Enum
 from flask_restful import Resource, reqparse
 from flask import Flask, Response, request
-from numpy import array
+# from numpy import array
 from operator import itemgetter
 import MySQLdb as sql
 import MySQLdb.connections as connections
