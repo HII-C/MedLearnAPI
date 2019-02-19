@@ -10,4 +10,4 @@ RUN apk add gcc libc-dev linux-headers mariadb-dev
 
 RUN pip install -r requirements.txt
 
-CMD python ./server.py --user "root" --password "HealthCreekMySQLr00t" --host "129.219.151.23" --db "derived"
+CMD python ./server.py --user "" --password "" --host "" --db "derived"
