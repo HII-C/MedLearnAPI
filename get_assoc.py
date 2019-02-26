@@ -2,17 +2,12 @@ import json
 from typing import Dict
 from flask_restful import Resource
 from flask import Response, request
-import MySQLdb as sql
-import MySQLdb.connections as connections
-#import pymysql as sql
+from util.db_util import DatabaseHandle
+
 
 
 class get_assoc(Resource):
-    host: str = ""
-    db: str = ""
-    table_name: str = ""
-    connection: connections.Connection = None
-    cursor: connections.cursors.Cursor = None
+    assoc_db: DatabaseHandle = None
 
     def __init__(self, db_params, table_name="assoc"):
         # def __init__(self, user='root', host='localhost', pw_='', db='derived', table_name="tmp_assoc"):
@@ -20,8 +15,7 @@ class get_assoc(Resource):
         self.host = db_params['host']
         self.db = db_params['db']
         self.table_name = table_name
-        self.connection = sql.connect(**db_params)
-        self.cursor = self.connection.cursor()
+        self.assoc_db = DatabaseHandle(**db_params)
 
     def get(self):
         response_list: list(dict) = list()
@@ -32,8 +26,8 @@ class get_assoc(Resource):
         exec = f'''
                     SELECT concept2, coeff FROM {self.table_name} WHERE concept1 = {conc_str}'''
 
-        self.cursor.execute(exec)
-        relations = self.cursor.fetchall()
+        self.assoc_db.cursor.execute(exec)
+        relations = self.assoc_db.cursor.fetchall()
 
         if len(relations) < response_len:
             response_len = len(relations)

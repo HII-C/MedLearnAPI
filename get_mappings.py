@@ -4,9 +4,7 @@ from typing import List, Tuple, Dict, Tuple
 from enum import Enum
 from flask_restful import Resource, reqparse
 from flask import Flask, Response, request
-# from numpy import array
-#import MySQLdb as sql
-import pymysql as sql
+from util.db_util import DatabaseHandle
 
 
 class ConceptType(Enum):
@@ -60,25 +58,15 @@ class Mapping:
 
 
 class get_mapppings(Resource):
-    user: str = ""
-    host: str = ""
-    pw_: str = ""
-    db: str = ""
-    table_name: str = ""
+    map_db: DatabaseHandle = None
     coeff_dict_form: Dict[str, int] = {"gain": 3}
-    conn: sql.connections.Connection = None
-    cursor: sql.cursors.Cursor = None
 
-    def __init__(self, user='hiic', host='db01.healthcreek.org', pw_='greenes2018', db='derived', table_name="tmp"):
+    def __init__(self, db_params, table_name="tmp"):
         # the connection to the database only has to occur once therefor, it can occur in the initialization
-        self.user = user
-        self.host = host
-        self.pw_ = pw_
-        self.db = db
-        self.conn = sql.connect(user=self.user, host=self.host,
-                                db=self.db, passwd=self.pw_)
-        self.cursor = self.conn.cursor()
+        self.host = db_params['host']
+        self.db = db_params['db']
         self.table_name = table_name
+        self.map_db = DatabaseHandle(**db_params)
 
     # Parameters of form: {'subj_list': [ ... ], 'obj_list': [ ... ]}
     def get(self):
@@ -120,10 +108,10 @@ class get_mapppings(Resource):
                 exec_str = f"""SELECT * FROM {self.table_name} {where_query}"""
                 print(exec_str)
 
-                self.cursor.execute(exec_str)
+                self.map_db.cursor.execute(exec_str)
 
                 # assuming: c1 | c2 | rela | gain | boost | bs
-                row = self.cursor.fetchall()
+                row = self.map_db.cursor.fetchall()
 
                 if (len(row) == 0):
                     continue

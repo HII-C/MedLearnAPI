@@ -2,27 +2,19 @@ import json
 from typing import Dict
 from flask_restful import Resource
 from flask import Response, request
-import MySQLdb as sql
-# import MySQLdb.connections as connections
-#import pymysql as sql
+from util.db_util import DatabaseHandle
+
 
 
 class get_relation(Resource):
-    host: str = ""
-    db: str = ""
-    table_name: str = ""
-    connection = None
-    cursor = None
+    rel_db: DatabaseHandle = None
 
     def __init__(self, db_params, table_name="relation"):
-        # def __init__(self, user='root', host='localhost', pw_='', db='derived', table_name="tmp_relation"):
         # the connection to the database only has to occur once therefor, it can occur in the initialization
         self.host = db_params['host']
         self.db = db_params['db']
         self.table_name = table_name
-        self.connection = sql.connect(**db_params)
-        self.cursor = self.connection.cursor()
-        print("connected")
+        self.rel_db = DatabaseHandle(**db_params)
 
     def get(self):
         try:
@@ -36,8 +28,8 @@ class get_relation(Resource):
             exec = f'''
                                 SELECT concept2, coeff, relation FROM {self.table_name} WHERE concept1 = {conc_str}'''
 
-            self.cursor.execute(exec)
-            relations = self.cursor.fetchall()
+            self.rel_db.cursor.execute(exec)
+            relations = self.rel_db.cursor.fetchall()
 
             if len(relations) < response_len:
                 response_len = len(relations)
