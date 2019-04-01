@@ -6,7 +6,7 @@ from flask_restful import Resource, reqparse
 from flask import Flask, Response, request
 # from numpy import array
 from operator import itemgetter
-from util.db_util import DatabaseHandle
+from associations.util.db_util import DatabaseHandle
 
 class get_output(Resource):
     output_db: DatabaseHandle = None

@@ -2,7 +2,7 @@ import json
 from typing import Dict
 from flask_restful import Resource
 from flask import Response, request
-from util.db_util import DatabaseHandle
+from associations.util.db_util import DatabaseHandle
 
 
 
