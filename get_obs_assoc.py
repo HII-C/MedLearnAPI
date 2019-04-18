@@ -50,6 +50,8 @@ class get_obs_assoc(Resource):
             raise ValueError("Data must have non-zero length")
 
         # check if the table exists in the first place
+
+
         tbl_query = f'''
                     SELECT TABLE_NAME FROM {db_name}.TABLES WHERE TABLE_NAME = '{self.table_name}'
                     AND AND TABLE_SCHEMA = '{db_name}'
