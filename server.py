@@ -59,4 +59,4 @@ api.add_resource(get_obs_assoc, '/get_obs_assoc',
 
 app.debug = True
 
-app.run(host='0.0.0.0', port='5000', threaded=True)
+app.run(host='0.0.0.0', port='3090', threaded=True)
